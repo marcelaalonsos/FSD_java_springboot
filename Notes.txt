@@ -1,0 +1,122 @@
+NOTES
+
+1. MongoD Atlas setup
+- create new project named MovieAPI
+- create a database using the 'Build a Database' button from the website
+- select M0 as the data will be small
+- select AWS as the provider
+- do not change any settings or cluster name
+- hit create button
+- on the next page, choose username and password to authenticate the connection
+- make sure to copy the password
+user: SolidSnake
+password: jv3MfSRJ8IGwVQYE
+- next in the entries fr IP, write 0.0.0.0/0 in the IP address and write 'everywhere' in the description
+- hit 'add entry'
+- hit 'finish and close'
+
+- after the database is setup and you are in the DB page, you can connect with an application
+- we're going to choose Compass
+- click on Compass and install if not already in the machine
+- once it is downloaded, use the GUI to navigate to connect a new URI
+- replace the URI provided with the connection string in the connect cluster modal
+- replace <password> with the password created for the user
+- hit save and connect in order to change the name of the connection and color
+
+- there will be 2 databases included: admin and local
+- to create a new database, click on the + sign in the Databases segment
+- it will ask for a name and collection name
+- since MongoDB is a nonSQL, it has no tables, but we have to specify what we are saving on it
+- create a new db with the name 'movie-api-db' and collection name 'movies'
+
+- you can import data for the database
+- in this case, using a json file from the instructors github repository
+- save the json file in a local folder
+- then hit ' import data' button
+- once imported, you can see that 10 movies were added
+- each movie is a document
+
+2. Setup spring boot
+- go to https://start.spring.io/
+- select java as language
+- maven as project generator
+- springboot version 3.0.9
+- fill in the metadata
+- group is in reverser URL, meaning that com comes first (as in .com), write anything you want: dev.marcela
+- artifact: movies (since its related to movies)
+- name is autofilled
+- write a simple description for the project
+- package name is autofilled
+- pick jar as packaging since its widely used
+- and version 17 of java because that's what we have installed
+- on the dependencies column:
+- pressing down CTRL select the dependencies you need
+- we added: lombok, spring web, spring data mongoDB, and spring boot dev tools
+- click on 'generate' and it will download a zip file
+- extract the contents into your project folder
+
+3. IntelliJ
+- open the project folder in IntelliJ
+- the src folder is where we will work
+- go to the main / java / dev.marcela.movies and there we will find the MoviesApplication class created for us
+- run the application with the green play button on the top
+- on the terminal, we will see logs and an error because the db is yet to be connected to the project
+- go to pom.xml file and comment out the mongodb dependency for the time being
+- run the app again it should show no errors
+- run the app on the web by writing localhost:8080 in the bar
+- we will see a whitelabel error page, which means, we are hitting the right address but there is no endpoint
+- we will write an end point next
+- on the MoviesApplication add @RestController to the code after the @SpringBootApplication
+- inside the main method, add @GetMapping and write a method called apiRoot that will return a String "hello world"
+- the @GetMapping tells the program the method is a get endpoint, write ("/") after the getmapping, stop the program and run it again
+- refresh the page in the browser and we should see hello world printed in the screen
+- getMapping basically makes sure that when we hit the point it shows something
+
+4. Writing the movies api
+- comment out or remove the code we just wrote
+- connect the database
+- go to src / resources and open the application.properties file
+- to connect the db, write:
+spring.data.mongodb.database = movie-api-db --> where this is the db name
+spring.data.mongodb.uri = mongodb+srv://SolidSnake:jv3MfSRJ8IGwVQYE@cluster0.18yhcun.mongodb.net --> from the compass GUI
+- these type of sensitive data should go on an .env file
+- on the resources folder add an .env file to store the sensitive variables
+- add .env to the .gitignore
+- install a dependency for the env files
+- to add a new dependency, go to the pom.xml file and after the last dependency, write dependency and it will autocomplete for you
+- for the grouup Id : me.paulschwarz
+- for the artifactid: spring-dotenv
+- version: write latest version
+- reload maven to make sure the plugin works
+- in te application properties replace the database, user, password and cluster with the parameters from the env file using ${}
+- run the program to see if it compiles without an error
+
+5. Creating the classes
+- in the dev.marcela.movies folder create a new class called Movie
+- import the @Document to make sure it refers to the db documents we have in MongoDB
+- in (collection = "movies") to refer to the collection in the database
+- inside the class, write all the parameters it will have like the id, title, etc as private
+- import @Id within the class
+- import org.bson.types.ObjectId; in the header
+- add @Data to make all the setter and getter methods
+- add @AllArgsConstructor to pass the private arguments into methods
+- add @NoArgsConstructor that takes no parameters whatsoever
+
+- make the reviews class
+- in the dev.marcela.movis folder create a new class called Review
+- even tho we have not created the collection for reviews, it will know
+- import the @Document(collection = "reviews")
+- import @Data, @AllArgsConstructor, and @NoArgsConstructor
+- this class will have 2 properties id and body
+- import @Id within the class
+
+- in the movie class, add the property reviewIds as a List<Review> and before it add @DocumentReference, so it saves the id here but the reviews somewhere else
+
+6. Movie controller
+- in the dev.marcela.movies folder create a new class called MovieController
+- annotate @RestController
+- annotate @RequestMapping("/api/v1/movies")
+- in the class, create a get api with @GetMapping
+- for now, the method should return the string "all movies!"
+
+
