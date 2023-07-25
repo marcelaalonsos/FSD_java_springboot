@@ -9,8 +9,7 @@ NOTES
 - hit create button
 - on the next page, choose username and password to authenticate the connection
 - make sure to copy the password
-user: SolidSnake
-password: jv3MfSRJ8IGwVQYE
+
 - next in the entries fr IP, write 0.0.0.0/0 in the IP address and write 'everywhere' in the description
 - hit 'add entry'
 - hit 'finish and close'
@@ -78,7 +77,7 @@ password: jv3MfSRJ8IGwVQYE
 - go to src / resources and open the application.properties file
 - to connect the db, write:
 spring.data.mongodb.database = movie-api-db --> where this is the db name
-spring.data.mongodb.uri = mongodb+srv://SolidSnake:jv3MfSRJ8IGwVQYE@cluster0.18yhcun.mongodb.net --> from the compass GUI
+spring.data.mongodb.uri =  --> from the compass GUI
 - these type of sensitive data should go on an .env file
 - on the resources folder add an .env file to store the sensitive variables
 - add .env to the .gitignore
@@ -118,5 +117,37 @@ spring.data.mongodb.uri = mongodb+srv://SolidSnake:jv3MfSRJ8IGwVQYE@cluster0.18y
 - annotate @RequestMapping("/api/v1/movies")
 - in the class, create a get api with @GetMapping
 - for now, the method should return the string "all movies!"
+- altho, we can return a string, its better to return a Response
+- edit the method to ResponseEntity<String> allMovies()
+- it will return a new ResponseEntity<String>("All Movies!", HttpStatus.OK); --> all movies corresponds to the body, and HttpStatus.OK is 200 meaning good connection
+
+7. Creating service and repository class
+- in the dev.marcela.movies folder create a new class called MovieRepository as an Interface
+- the interface class will extend from MongoRepository<Movie, ObjectId>
+- we have to annotate @Repository so the framework knows it is a repository
+- then we create the service class
+- we have to annotate @Service so the framework knows it is a service
+- this class will manage the db
+- inside the class, we will create db access methods
+- let's start with getting all the movies
+- create a public List<Movie>allMovies() method within the class
+- inside the service class we will need a reference to the repository, create a property private MovieRepository movieRepository;
+- inside the service class anotate the movieRepository property as a @Autowired to tell the framework to instantiate the MovieRepository for us
+- inside the method, we will return movieRepository.findAll()
+
+- in the controller class, we will need to create a reference to the service class
+- inside the class, before the getmapping, write private MovieService movieService; and annotate with @Autowired
+- in the controller class getAllMovies method, we will return a List<Movie> instead of a String, edit the method name
+- inside the method, we will return new ResponseEntity<List<Movie>>(movieService.allMovies(), HttpStatus.OK);
+- run the program and refresh the browser, the array of 10 movies should be showing
+
+SUMMARY SO FAR:
+- in REST API we have multiple layers:
+  1. api layer which is the MovieController, which only concerns with the task of getting a request from the user and returning a Response
+  it is using the service class to fetch all the movies from the db
+  2. in the service class if where we
+
+
+
 
 
