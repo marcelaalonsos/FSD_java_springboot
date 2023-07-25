@@ -145,7 +145,35 @@ SUMMARY SO FAR:
 - in REST API we have multiple layers:
   1. api layer which is the MovieController, which only concerns with the task of getting a request from the user and returning a Response
   it is using the service class to fetch all the movies from the db
-  2. in the service class if where we
+  2. in the service class if where we handle the business logics
+  it uses the repository class to talk to the database and return the movie list on the controller
+  3. the repository class is the data access layer, it talks to the database and gets the data back
+
+8. create a route for a single movie
+- in the movie controller class, create a new @GetMapping
+- this time the @GetMapping("/{id}") --> because we are looking for a specific id
+- create the method public ResponseEntity<Movie> getSingleMovie() {}
+- inside the parenthesis we will write @PathVariable to let the framework know we will be passing the information we got from the mapping as a path variable
+- complete the @PathVariable ObjectId id --> meaning we are looking for the id
+
+- go to the service class and add a new method public Movie singleMovie(ObjectId id)
+- it should return movieRepository.findById(id);
+- however it is possible that the program might not find the id and needs to return null
+- to let java do that we have to modfy the method to say Optional<Movie>
+
+- back in the controller class, edit the single movie method to return <Optional<Movie>>
+- inside the method code block return new ResponseEntity<Optional<Movie>>(movieService.singleMovie(id), HttpStatus:OK);
+- in the browser look for a movie with the id, and it should be returned
+
+- but we don't want to expose the movie id, rather look for them with the imdbId, but the repository does not have that setup by default, we would have to create a custom method
+- we will use automatic queries to do so
+- inside the class create a method Optional<Movie> findMoviebyImdbId(String imdbId);
+- go to the service class and edit single movie method
+- we're getting the single movie (String imdbId), and in the return we are using findMoviebyImdbId(imdbId)
+- go to the movie controller change the getMapping to imdbId inside the curly braces
+- in the method use String imdbId, and also in the movieService.singleMovie(imdbId)
+- run the program and search by imdbId in the browser
+
 
 
 
