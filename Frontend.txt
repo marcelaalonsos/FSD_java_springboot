@@ -1,0 +1,187 @@
+NOTES
+
+1. Creating boilerplate using the creat react app
+- create a working folder called MovieClient
+- in the VS terminal type npx create-react-app movie-gold-v1
+- once its complete, cd into the file created movie-gold-v1
+- type code . to generate a new window for coding in the project
+- within the src folder remove the tests files and the webstat files
+- on the package.json remove the eslint property
+- on the index.js file remove the code for reportweb functionality
+- run npm start on the terminal
+- npm install axios --> to manage hhtp requests
+- npm install bootstrap
+- import it on the index.js file header: import 'bootstrap/dist/css/bootstrap.min.css';
+- npm i react-bootstrap
+- npm i @fortawesome/react-fontawesome
+- npm i @fortawesome/free-solid-svg-icons
+- npm i react-player
+- npm i react-router-dom
+- npm install @mui/material @emotion/react @emotion/styled
+- npm install react-material-ui-carousel
+
+2. axios setup
+- create a folder within the src folder called api
+- inside the folder create a file called axiosConfig.js
+- import axios on the header: import axios from 'axios'
+export default axios.create({
+  baseURL: '',--> with the forwarding https created in the ngrok terminal using the command ngrok http 8080 --> 8080 since it's the same as the backend
+  headers: {"ngrok-skip-browser-warning": "true"}
+})
+- the baseURL is to avoid making repeat calls
+- the ngrok helps make the http request and not be blocked by CORS
+
+3. app.js
+- write code to create an endpoint that will return an array of movie data
+- remove logo.svg on the header
+- on the function remove all the body except for the div
+- import api from './api/axiosConfig'; in the header
+- import useState, useEffect from 'react'
+- return a destructered array in the function: const [movies, setMovies] = useState();
+- let's create a function that handles the http request and renders the movies array
+- it will be an asyncronous call to get response of the api/v1/movies
+  const getMovies = async () => {
+    try {
+      const response = await api.get("/api/v1/movies");
+      console.log(response.data);
+      setMovies(response.data);
+    } catch(err) {
+      console.log(err);
+    }
+  }
+
+- run npm start in the terminal to start the application in the browser
+
+4. routing functionality
+- in the src folder, create a new folder called components
+- in there, create a file called Layout.js
+- import Outlet from the react-router-dom package in the header
+- import React from react in the header
+- create a component function with main tags instead of divs
+const Layout = () => {
+  return (
+    <main>
+
+    </main>
+  )
+}
+
+export default Layout
+
+- include a reference to the outlet component <Outlet /> within the main tags
+- in the App.js, import the Layout component:
+- import the Routes, Route from the react-router-dom
+- in the return, inside the div, create the parent Routes and child Route, the route should reference to the Layout
+  return <div className="App">
+    <Routes>
+      <Route path="/" element={Layout}>
+
+      </Route>
+    </Routes>
+  </div>;
+
+- in the index.js file, import the BrowserRouter, Route, Routes from react-router dom in the header
+- inside the react strict mode, write in the references to them
+    <BrowserRouter>
+      <Routes>
+        <Route path="/*" element={<App />}></Route>
+      </Routes>
+    </BrowserRouter>
+
+5. home component
+- in the components folder, create a folder called home
+- inside the home folder, create a file called Home.js
+import React from "react";
+
+const Home = () => {
+  return (
+    <div>
+      Welcome!!
+    </div>
+  )
+}
+
+export default Home
+
+- in the app.js we'll create a route that goes to the home component
+- in the app.js import the Home component in the header
+in the Routes, add another Route:
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Home />}></Route>
+        </Route>
+      </Routes>
+
+6. hero component
+- in the components folder create a new folder called hero
+- inside the folder create a new file called Hero.js
+- add another file called Hero.css
+- in it import the Carousel from material ui and the hero.css file
+- import Paper from material ui
+- pass in the deconstructed {movies} as the props
+- in the return we will map the movies into the carousel, add css className tags to all relevant divs
+- in the Home.js, import the Hero in the header
+- and in the return make a reference to it:
+const Home = ({ movies }) => {
+  return (
+    <Hero movies = {movies}/>
+  );
+};
+- in the app.js make sure the movies={movies} is passed in the Home element:
+    <div className="App">
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Home movies={movies}/>}></Route>
+        </Route>
+      </Routes>
+    </div>
+
+7. App and Hero css styling
+- refer to frontend github for more details
+- in the index.css file remove the code since it is not needed
+- in the hero css file - we will edit the carousel, refer to the frontend github for more details
+- in the hero.js we will implement inline styling to make the img of the movie carousel one of the backdrops:
+<div className="movie-card" style={{"--img": `url(${movie.backdrops[0]})`}}>
+
+8. header / navbar component
+- inside the components folder, create a folder called header
+- inside it, create a file called Header.js
+- import font awesome icon in the header
+- import faVideoSlash in the header
+- import Button from react-bootstrap
+- import Container from react-bootstrap
+- import Nav and Navbar from react-bootstrap
+- import NavLink from react-router-dom
+-inside the return:
+const Header = () => {
+  return (
+    <Navbar bg="dark" variant="dark" expand="lg">
+      <Container fluid>
+        <Navbar.Brand href="/" style={{"color": 'gold'}}>
+          <FontAwesomeIcon icon={faVideoSlash}/>Gold
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarScroll"/>
+        <Navbar.Collapse id="navbarScroll">
+          <Nav className="me-auto my-2 my-lg-0" style={{maxHeight: '100px'}} navbarScroll>
+            <NavLink className="nav-link" to="/">Home</NavLink>
+            <NavLink className="nav-link" to="/watchList">Watch List</NavLink>
+          </Nav>
+          <Button variant="outline-info" className="me-2">Login</Button>
+          <Button variant="outline-info" className="me-2">Register</Button>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  )
+}
+
+- in the app.js file import the header component in the header
+- reference it before the routes in the return
+<Header />
+- hit npm start and see the results in the webpage
+
+9. create a play trailer button for each movie in the carousel
+- in the components folder create a new folder called trailer
+- inside create Trailer.js and Trailer.css files
+
+
+

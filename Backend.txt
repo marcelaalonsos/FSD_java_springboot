@@ -174,6 +174,68 @@ SUMMARY SO FAR:
 - in the method use String imdbId, and also in the movieService.singleMovie(imdbId)
 - run the program and search by imdbId in the browser
 
+9. Review controller to let the user add/remove reviews to movies
+- in the dev.marcela.movies folder, create a new repository called ReviewRepository that extends MongoRepository<Review, ObjectId>
+- annotate as @Repository
+- create a new service class called ReviewService
+- annotate as service
+- inside the class create a method to create a new review public Review createReview(String reviewBody, String imdbId)
+- the method takes 2 arguments, first the body of the review itself, and second look for the movie with the right imdbId
+
+- in the Review class, generate a custom constructor that takes only the body
+public Review(String body) {
+  this.body = body;
+}
+- back in the review service pass the reviewBody to the new Review()
+- now that we have the review object, we will have to insert it to the database
+- to do so, we will need to create a reference to our review repository
+- before the method add private ReviewRepository reviewRepository; and annotate it as @Autowired
+- inside the method write reviewRepository.insert(review) to add to the db
+- now we have to associate it with one of the Movies
+- we will need a template to form a new dynamic query to put something in the database without using the repository
+- before the method @Autowired private MongoTemplate mongoTemplate;
+- in the method
+mongoTemplate.update(Movie.class)
+  .matching(Criteria.where("imdbId").is(imdbId))
+  .apply(new Update().push("reviewIds).value(review));
+
+- what we are doing is using the template to make an update call on the Movie class, then we perform the matching of which movie we are updating
+- we are updating a movie where the imdbId of the movie in the db matches the imdbId that we have received from the user
+- then we want to apply this update with a new Update definition which does the job of making the change inside the db
+- so we push the reviewIds array with the value of the review
+- finally, we put .first() to make sure we are updating a single movie
+- make an edit to the Review review as such:
+Review review = reviewRepository.insert(new Review(reviewBody));
+- finally we return the review we just created
+
+10. review controller
+- in the dev.marcela.movies folder create a new class called ReviewController
+- annotate with @RestController
+- annotate @RequestMapping("/api/v1/movies")
+- inside the method create a reference to the ReviewService and @Autowired it - private ReviewService reviewService
+- create a @PostMapping method
+public ResponseEntity<Review> createReview(@RequestBody Map<String, String> payload) {
+  return new ResponseEntity<Review>(reviewService.createReview(payload.get("reviewBody"), payload.get("imdbId)), HttpStatus.CREATED);
+}
+- the created status will be 201 meaning its ok created
+
+11. checking with Postman
+- after downloading postman, create a new collection called movies-api
+- then create a new GET request called get all movies
+- type in the URL localhost:8080/api/v1/movies
+- it should return the array of 10 documents of movies
+- copy one of the imdbId and create a new GET request called get single movie
+- in the URL localhost:8080/api/v1/movies/tt3915174 and it should show the single movie information
+- create a POST request called create new review
+- in Body using a JSON format write:
+{
+    "reviewBody": "10/10 funny.",
+    "imdbId": "tt3915174"
+}
+- click send and it should be displayed
+
+
+
 
 
 
