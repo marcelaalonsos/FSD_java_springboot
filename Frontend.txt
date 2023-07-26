@@ -182,6 +182,28 @@ const Header = () => {
 9. create a play trailer button for each movie in the carousel
 - in the components folder create a new folder called trailer
 - inside create Trailer.js and Trailer.css files
+- import useParams
+- import reactplayer
+- import the css
+const Trailer = () => {
+  let params = useParams();
+  const key = params.ytTrailerId;
+  return (
+    <div className="react-player-container">
+      {key != null ? (
+        <ReactPlayer
+          controls="true"
+          playing={true}
+          url={`https://www.youtube.com/watch?v=${key}`}
+          width="100%"
+          height="100%"
+        />
+      ) : null}
+    </div>
+  );
+};
 
+- in the app.js import trailer at the header and create the route reference:
+<Route path="/Trailer/:ytTrailerId" element={<Trailer />}></Route>
 
 
